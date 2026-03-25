@@ -1,4 +1,4 @@
-# Scytale-ASM Bridge for Havoc
+# Anodyne/Scytale-ASM Bridge for Havoc
 
 A stealthy, modular (C2) extension for the Havoc Framework. This project implements a custom, low-signal communication channel using custom Scytale encoding to bridge a raw Assembly implant with a Havoc Teamserver.
 
