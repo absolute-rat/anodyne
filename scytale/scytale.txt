@@ -1,1 +1,22 @@
 
+I was looking for a good way to reduce code footprint, and one part that bothered me was the rather beefy imports for things like traditional encryption/encoding. I had looked for other encoding methods, but everything was either too complex (favoring high security), or too simple (easy to spot XOR). I started this project as a way to make something custom, that could fit somewhere in-between.
+
+My first thought was to look for inspiration from the past, and this led me to looking for esoteric/ancient methods of encryption. I stumbled on a clever method used in ancient Greece, called a scytale:
+
+https://en.wikipedia.org/wiki/Scytale
+
+I found this method quite interesting, especially for the time period. Looking to how I could maybe turn this into code, the most obvious issue pops up - this is just a fixed length of bytes between the real bytes. However, what if I were to alter the 'rod' itself, and instead of a fixed-width diameter, I used a dynamic one. This seemed a lot more secure, as unless you have the right 'rod' (key), you can't easily determine where the right bytes are. My first iterations on this were building around the key idea, but I felt like that would arbitrarily make the function a little too rigid, if I needed to alter it to beat signatures.
+
+My second iteration for this moved the rod specification to the data stream itself, in order to get instruction count down even lower. A simple example of the way the stream is set up is:
+
++-+----+--+
+|A|BBBB|CC|
++-+----+--+
+
+In this case, A is a number value between 1 and 9. This value tells you how many junk characters (B) are between A and CC. CC represent the hex value (little endian) of the next real byte in the encoded data. All junk characters are random hex values (0-9,A-F), and the CC are the hex values as well. As an example:
+
+4F37D1421C146EB289A14
+
+This stream would produce "AAA" (41 41 41). As all bytes in the stream are hex values, the entropy should be low, but the tradeoff is roughly a ~5x size increase of any encoded data. You could write a manual encoder that has a bias to lower junk values to ensure a smaller overhead for large encoding, but the default was to try to keep the string looking as unspecific as possible. 
+
+The final decode function is down to just 39 bytes, which is small enough to fit in compact shellcode. Obviously, once you have the method, the data is trivial to decode, but as this project is likely to not get a whole lot of attention, I imagine this might be a nice way to slide in under some radar. Since the encoded method is so simple, it would also be relatively easy to make your own changes, in the event this was ever signatured.
